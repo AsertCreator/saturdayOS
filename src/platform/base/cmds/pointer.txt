@@ -1,0 +1,2 @@
+compilelink *
+copyto 1

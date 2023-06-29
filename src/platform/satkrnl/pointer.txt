@@ -1,0 +1,7 @@
+preserveobj
+compile ex
+compile hals
+linkscript kernel.ld
+linkall satkrnl
+copyto 3
+copyto 4

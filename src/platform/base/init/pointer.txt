@@ -1,0 +1,5 @@
+preserveobj
+compilefile *
+linkscript app.ld
+linkall init
+copyto 0

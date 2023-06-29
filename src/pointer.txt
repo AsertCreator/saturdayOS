@@ -1,0 +1,3 @@
+compile platform
+compile limine
+buildlimineiso limine.cfg

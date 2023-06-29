@@ -1,0 +1,8 @@
+copyraw limine-cd.bin 7
+copyraw limine-cd.bin -1
+copyraw limine-cd-efi.bin -1
+copyraw limine-pxe.bin -1
+copyraw limine.sys 7
+copyraw BOOTAA64.efi 9
+copyraw BOOTIA32.efi 9
+copyraw BOOTX64.efi 9

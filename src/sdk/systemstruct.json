@@ -1,0 +1,14 @@
+{
+	"directories": [
+		"system/",
+		"system/bin/",
+		"system/core/",
+		"system/core/main/",
+		"system/core/fallback/",
+		"system/lib/",
+		"home/",
+		"limine/",
+		"efi/",
+		"efi/boot/"
+	]
+}
