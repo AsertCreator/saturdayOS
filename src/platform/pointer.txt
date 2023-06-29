@@ -1,2 +1,0 @@
-compile base
-compile core
