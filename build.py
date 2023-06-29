@@ -217,7 +217,10 @@ class StartEngine32:
 		self.iso = iso
 
 	def run(self):
-		if os.system("qemu-system-" + self.qemu + " -m " + str(self.memory) + " -cdrom " + self.iso + " -pflash " + self.bios) == 0:
+		qemuargs = ("qemu-system-" + self.qemu + " -m " + str(self.memory) + " -cdrom " + self.iso + ((" -pflash " + self.bios) if self.bios is not None else " "));
+		print("exeucting qemu with args : " + qemuargs);
+
+		if os.system(qemuargs) == 0:
 			print("qemu stopped successfully! i'm hoping you had fun using freshly baked saturdayOS!");
 		else:
 			print("uh-oh, qemu has crashed!");
@@ -241,7 +244,7 @@ if __name__ == "__main__":
 		print("built successfully")
 
 		if "run" in sys.argv:
-			stengine = StartEngine32("./build" + str(mkengine.arch) + "/os_build.iso", "\"C:/Program Files/qemu/share/edk2-i386-code.fd\"");
+			stengine = StartEngine32("./build" + str(mkengine.arch) + "/os_build.iso", "\"C:/Program Files/qemu/share/edk2-i386-code.fd\"" if mkengine.arch % 2 != 0 else None);
 			stengine.run();
 	else:
 		mkengine.clean();

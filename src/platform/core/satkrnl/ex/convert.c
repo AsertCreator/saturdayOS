@@ -11,9 +11,10 @@ bool StdStringContains(const char* str, const char* find) {
     size_t sized = StdStringLength(find);
     size_t e = 0;
     for (size_t i = 0; i < sizes; i++)
-        if (str[i] == find[e++])
-            if (e == sized) 
+        if (str[i] == find[e++]) {
+            if (e == sized)
                 return true;
+        }
         else
             e = 0;
     return false;

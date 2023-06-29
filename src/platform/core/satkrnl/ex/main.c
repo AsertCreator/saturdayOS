@@ -83,7 +83,6 @@ void BspMgrEntrypoint(struct multiboot_tag* header, uint32_t magic) {
     struct multiboot_tag* tag;
     struct multiboot_tag_framebuffer* fb;
     struct multiboot_tag_string* str;
-#define ARCH 1
 #if ARCH == 1
     struct multiboot_tag_efi32* e32;
 #endif
