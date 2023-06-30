@@ -4,6 +4,5 @@ iso/
 x86/
 x64/
 *.o
-*.bin
 *.iso
 build*/
