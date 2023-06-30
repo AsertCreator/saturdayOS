@@ -195,7 +195,7 @@ class MakeEngine32:
 					if os.system(cmd) != 0:
 						self.fail("couldn't make an iso")
 
-					cmd = ".\src\limine\limine-deploy " + "./build" + str(self.arch) + "/os_build.iso"
+					cmd = ".\src\limine\limine bios-install " + "./build" + str(self.arch) + "/os_build.iso"
 					if os.system(cmd) != 0:
 						self.fail("couldn't deploy limine to iso")
 				elif opcode == "incdir":
