@@ -22,8 +22,10 @@ class MakeEngine32:
 		self.output = "";
 		self.arch = 0;
 		self.struct = None;
+		self.rebuild = False;
 
 	def clean(self):
+		shutil.rmtree(".cache");
 		shutil.rmtree("build" + str(self.arch));
 		os.mkdir("build" + str(self.arch));
 
@@ -52,26 +54,40 @@ class MakeEngine32:
 
 	def compilefile(self, file, outdir, settings, link):
 		obj = None;
+		self.mkdirut(os.path.dirname(file.replace("src/", ".cache/")))
+		orgsrcf = open(file);
+		chcsrcf = open(file.replace("src/", ".cache/"), "w"); # creating cache source file
+		chcsrcf.close() 
+		chcsrcf = open(file.replace("src/", ".cache/"), "r+");
+		orgsrcs = orgsrcf.read();
+		chcsrcs = chcsrcf.read();
+
 		for ext in self.sourceext:
 			if ext in file:
 				obj = file.replace(ext, ".o").replace("src/", outdir) if link else file.replace(ext, "").replace("src/", outdir);
-				self.mkdirut(os.path.dirname(obj))
+				self.mkdirut(os.path.dirname(obj));
+
+				if orgsrcs != chcsrcs and not self.rebuild:
+					return obj;
 
 				if ext == ".asm":
 					if os.system("nasm -felf32 -o " + obj + " " + file) == 0:
 						print(bcolors.OKCYAN + "\tcompiled file " + file + bcolors.ENDC);
+						shutil.copy(file, file.replace("src/", ".cache/"));
 					else:
 						print(bcolors.FAIL + "\tfailed to compile file " + file + bcolors.ENDC);
 						return -1;
 				elif ext == ".c":
 					if os.system(settings["compiler"] + " -Wall -Wextra -Werror -fms-extensions -nostdlib -o " + obj + " " + file + " -ffreestanding -mgeneral-regs-only -mno-red-zone -O0" + (" -s" if "--preserve-symbols" not in sys.argv else "") + (" -c" if link else "") + " -I " + settings["id"] + " -DARCH=" + str(self.arch)) == 0:
 						print(bcolors.OKCYAN + "\tcompiled file " + file + bcolors.ENDC);
+						shutil.copy(file, file.replace("src/", ".cache/"));
 					else:
 						print(bcolors.FAIL + "\tfailed to compile file " + file + bcolors.ENDC);
 						return -1;
 				elif ext == ".cpp":
 					if os.system(settings["compiler"] + " -Wall -Wextra -Werror -fms-extensions -nostdlib  -o " + obj + " " + file + " -ffreestanding -mgeneral-regs-only -mno-red-zone -fno-exceptions -fno-asynchronous-unwind-tables -O0" + ("-s" if "--preserve-symbols" not in sys.argv else "") + (" -c" if link else "") + " -I " + settings["id"] + " -DARCH=" + str(self.arch)) == 0:
 						print(bcolors.OKCYAN + "\tcompiled file " + file + bcolors.ENDC);
+						shutil.copy(file, file.replace("src/", ".cache/"));
 					else:
 						print(bcolors.FAIL + "\tfailed to compile file " + file + bcolors.ENDC);
 						return -1;
@@ -235,10 +251,12 @@ if __name__ == "__main__":
 	settings["linker"] = "i686-elf-gcc";
 	settings["id"] = "src/sdk/"
 
+	if "--arch" in sys.argv:
+		mkengine.arch = int(sys.argv[sys.argv.index("--arch") + 1])
+
 	if "clean" not in sys.argv:
 		rootptr = mkengine.readfile("src/pointer.txt");
-		if "--arch" in sys.argv:
-			mkengine.arch = int(sys.argv[sys.argv.index("--arch") + 1])
+		mkengine.rebuild = "--rebuild" in sys.argv
 		mkengine.makefullstruct();
 		mkengine.processpointer(rootptr, "src", settings);
 		print("built successfully")
