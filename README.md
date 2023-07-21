@@ -28,7 +28,7 @@ architectures. 0 is x86-32 (BIOS) and 1 is x86-32 (UEFI). You can specify your d
 `--arch` argument. "But it doesn't run the OS! What do I do?". In `build[arch number]`
 folder there's should be `os_image.iso` file which contains Live CD version of the OS. Plug
 it into QEMU and done! But you like automatization like me, pass `run` argument to aforementioned
-script, and it will automatically run QEMU. It does except QEMU to be in `PATH`, be aware.
+script, and it will automatically run QEMU. QEMU must be in `PATH`.
 
 
 **Q**: Minimum system requirements?<br/>
@@ -60,6 +60,6 @@ Brandon Freisen - For making bkern, which serves as foundation for satkrnl. Lice
 
 Limine Contributors - For making Limine bootloader, which serves as saturdayOS bootloader. License: BSD-2-Clause.
 
-Contributors - for saturdayOS. License: BSD-3-Clause.
+Contributors - For saturdayOS. License: BSD-3-Clause.
 
-<b>Copyright 2022-2023 AsertCreator and contributors.</b>
+<b>Copyright 2022-2023 saturdayOS Project.</b>
