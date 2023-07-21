@@ -1,7 +1,7 @@
 #include "../include/timer.h"
 
-uint64_t timer_ticks = 0;
-uint64_t timer_secondspassed = 0;
+volatile uint64_t timer_ticks = 0;
+volatile uint64_t timer_secondspassed = 0;
 
 void HALTimerIRQHandler(RegisterContext *r) {
     NEVER_REFERENCED(r);
@@ -13,7 +13,7 @@ void HALTimerIRQHandler(RegisterContext *r) {
 
 void HALWaitTicks(uint64_t ticks) {
     uint64_t eticks = timer_ticks + ticks;
-    while (timer_ticks < eticks) { }
+    while (timer_ticks < eticks) {}
 }
 
 void HALInitializeSystemTimer() {

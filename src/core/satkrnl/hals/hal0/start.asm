@@ -349,6 +349,9 @@ isr_common_stub:
     popa
     add esp, 8
     iret
+
+extern HALSwitchThread
+
 ; 32: IRQ0
 irq0:
     cli
@@ -512,6 +515,12 @@ IRQCommonStub:
     add esp, 8
     iret
 
+HALGetCPUFlags:
+    pushf
+    pop eax
+    ret
+
+global HALGetCPUFlags
 
 section .multiboot
 align 8
@@ -540,4 +549,6 @@ align 8
 SECTION .bss
     resb 16384               ; This reserves 16 KBs of memory here
 SystemStack:
+    resb 512
+SchedulerStack:
 

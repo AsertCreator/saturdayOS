@@ -1,2 +1,2 @@
 compile cmds
-compile init
+compile shmgr

@@ -1,5 +1,5 @@
 preserveobj
 compilefile *
 linkscript app.ld
-linkall init
+linkall shmgr
 copyto 0

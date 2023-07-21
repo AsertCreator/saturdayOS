@@ -1,12 +1,12 @@
 #include "include/panic.h"
 
-void BspMgrIssuePanic(const char* msg) {
-	TtyMgrLog(FAILED_GENERAL, "hal", "\n\n!!! panic, msg=\"%s\", cpu=%d !!!", msg, 0);
-	TtyMgrLog(FAILED_GENERAL, "hal", "please reboot this device");
-	HALHaltCPU();
+void ExIssuePanic(const char* msg, uint32_t faultaddr) {
+	printf("\n\n!!! panic, msg=\"%s\", faultaddr=%x, cpu=%d !!!\n", msg, faultaddr, 0);
+	printf("please reboot this device\n");
+	ExHaltCPU();
 }
-void HALHaltCPU() {
-	TtyMgrLog(FAILED_GENERAL, "hal", "cpu halted!");
+void ExHaltCPU() {
+	printf("cpu halted!\n");
 	HALDisableInterrupts();
 	while (1) { }
 }

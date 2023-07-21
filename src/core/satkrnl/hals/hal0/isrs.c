@@ -87,7 +87,6 @@ void HALInitializeTraps() {
 
 void HALHandleFault(RegisterContext* r) {
     if (r->int_no < 32) {
-        BspMgrIssuePanic(exception_messages[r->int_no]);
-        HALHaltCPU();
+        ExIssuePanic(exception_messages[r->int_no], r->eip);
     }
 }

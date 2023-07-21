@@ -7,6 +7,8 @@
 HeapObject system_heap;
 char system_cmdline[512];
 
+void BspMgrEntrypoint2();
+
 HeapObject BspMgrInitializeSystemHeap(void* at) {
     TtyMgrLog(SUCCESS, "bspmgr", "initializing heap...");
 
@@ -21,6 +23,8 @@ HeapObject BspMgrInitializeSystemHeap(void* at) {
 }
 
 void BspMgrInitializeHAL() {
+    ENTER_CRITICAL_ZONE;
+
     TtyMgrLog(SUCCESS, "bspmgr", "initializing hal...");
 
 #if ARCH == 0
@@ -40,18 +44,21 @@ void BspMgrInitializeHAL() {
     // TtyMgrLog("bspmgr", "initializing paging...");
     // HALInitializePaging();
 
-    TtyMgrLog(SUCCESS, "bspmgr", "initializing timer...");
-    HALInitializeSystemTimer();
+    // TtyMgrLog(SUCCESS, "bspmgr", "initializing timer...");
+    // HALInitializeSystemTimer();
 
-    TtyMgrLog(SUCCESS, "bspmgr", "initializing devmgr...");
-    DevMgrInitialize();
+    TtyMgrLog(SUCCESS, "bspmgr", "initializing pci...");
+    HALPciScanEverything();
+
+    // TtyMgrLog(SUCCESS, "bspmgr", "initializing devmgr...");
+    // DevMgrInitialize();
 
     // human interaction interface
     if (HALInitializeHumanInteraction() != 0) {
-        BspMgrIssuePanic("unexpected error occurred during hii initialization!");
+        ExIssuePanic("unexpected error occurred during hii initialization!", 0);
     }
 
-    HALEnableInterrupts();
+    LEAVE_CRITICAL_ZONE;
 
     TtyMgrLog(SUCCESS, "bspmgr", "initialized hal");
 }
@@ -69,9 +76,14 @@ void BspMgrEntrypoint(struct multiboot_tag* header, uint32_t magic) {
     // nothing works there
 
     TtyMgrInitialize();
-    // early tty works there
+    HALSetupSerialPorts();
 
-    TtyMgrLog(SUCCESS, "bspmgr", "satkrnl, version: %d.%d patch %d", SATKRNL_VERSION_MAJOR, SATKRNL_VERSION_MINOR, SATKRNL_VERSION_PATCH);
+    // early tty and serial work there
+
+    TtyMgrLog(SUCCESS, "bspmgr", "satkrnl, version: %s.%s patch %s", 
+        TO_STRINGX(SATKRNL_VERSION_MAJOR), 
+        TO_STRINGX(SATKRNL_VERSION_MINOR), 
+        TO_STRINGX(SATKRNL_VERSION_PATCH));
 
     if (magic != MULTIBOOT2_BOOTLOADER_MAGIC) {
         // bootloader is not mb2 complaint. how dare it!
@@ -104,8 +116,8 @@ void BspMgrEntrypoint(struct multiboot_tag* header, uint32_t magic) {
             break;
         case MULTIBOOT_TAG_TYPE_EFI32:
 #if ARCH == 0
-            TtyMgrLog(FAILED_NOTIMPL, "bspmgr", "probably booted on uefi. make sure you are using correct kernel, cus this is bios kernel");
-            HALHaltCPU();
+            TtyMgrLog(FAILED_NOTIMPL, "bspmgr", "probably booted on uefi. make sure you are using correct kernel, cause this is bios kernel");
+            ExHaltCPU();
 #elif ARCH == 1
             e32 = (struct multiboot_tag_efi32*)tag;
 #endif
@@ -123,33 +135,45 @@ void BspMgrEntrypoint(struct multiboot_tag* header, uint32_t magic) {
 
     NEVER_REFERENCED(fb);
 
-    system_heap = BspMgrInitializeSystemHeap((void*)(8 * 1024 * 1024));
+    system_heap = BspMgrInitializeSystemHeap((void*)(16 * 1024 * 1024));
     // heap works there
 
+    BspMgrInitializeHAL();
+
+    ThreadObject* thread;
+    status threadstatus = ExCreateThread("saturdayOS Kernel", BspMgrEntrypoint2, 2 * 1024, &thread);
+
+    if (DID_FAIL(threadstatus) && threadstatus == FAILED_OUTOFMM) {
+        ExIssuePanic("couldn't create kernel thread, out of memory", (uint32_t)threadstatus);
+    }
+    else if (DID_FAIL(threadstatus)) {
+        ExIssuePanic("couldn't create kernel thread, unknown error", (uint32_t)threadstatus);
+    }
+
+    TtyMgrLog(SUCCESS, "bspmgr", "initializing threading...");
+    ExInitializeThreading();
+    TtyMgrLog(SUCCESS, "bspmgr", "initialized threading");
+    DEBUG;
+
+    LEAVE_CRITICAL_ZONE;
+    // threads work here
+
+    while (true) { }
+    // scheduler won't return to this chain. ever.
+}
+void BspMgrEntrypoint2() {
     // system is not initialized at this moment
     // almost every API is not working there
 
-    BspMgrInitializeHAL();
     BspMgrInitializeEx();
 
     // system is somewhat intialized at this moment
 
-    TtyMgrLog(SUCCESS, "bspmgr", "initializing shell...");
+    TtyMgrLog(SUCCESS, "bspmgr", "starting shell manager...");
 
-    // run init program here
-    // ExStartProcess("FS0:/system/init");
+    // ExStartProcess("FS0:/system/shmgr");
 
     for (;;);
-
-    TtyMgrLog(SUCCESS, "bspmgr", "starting shell...");
-
-    // ExStartProcess("FS0:/system/sh");
-
-    // shell is dead there, shutdown the system
-
-    TtyMgrLog(SUCCESS, "bspmgr", "shutting down...");
-
-    // ExStartProcess("FS0:/system/uninit");
 
     HALLateShutdown();
 

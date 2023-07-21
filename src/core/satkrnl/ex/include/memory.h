@@ -3,5 +3,4 @@
 
 void StdCopyMemory(void* dst, void* src, size_t count);
 void StdFillMemory(void* dst, uint8_t val, size_t count);
-uint8_t HALInputFromPort(uint16_t _port);
-void HALOutputToPort(uint16_t _port, uint8_t _data);
+void StdFillMemoryW(void* dst, uint16_t val, size_t count);

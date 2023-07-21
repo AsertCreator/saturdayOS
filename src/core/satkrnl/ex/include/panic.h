@@ -1,5 +1,5 @@
 #pragma once
 #include "../../include/system.h"
 
-void BspMgrIssuePanic(const char* msg);
-void HALHaltCPU();
+void ExIssuePanic(const char* msg, uint32_t faultaddr);
+void ExHaltCPU();

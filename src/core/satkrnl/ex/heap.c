@@ -19,8 +19,9 @@ void* HeapAlloc(HeapObject* heap, size_t size) {
     HeapNodeObject* found = HeapGetBestFit(temp, size);
 
     while (found == NULL) {
-        if (index + 1 >= BIN_COUNT)
+        if (index + 1 >= BIN_COUNT) {
             return NULL;
+        }
 
         temp = heap->bins[++index];
         found = HeapGetBestFit(temp, size);

@@ -1,17 +1,23 @@
 #pragma once
 #include "../../include/system.h"
 
-#define FILE_SHARE_READ 0
-#define FILE_SHARE_WRITE 1
-#define FILE_SHARE_DEL 2
+enum FileShareType {
+	FILE_SHARE_READ = 0,
+	FILE_SHARE_WRITE = 1,
+	FILE_SHARE_DEL = 2
+};
 
-#define FILE_ACCESS_READ 0
-#define FILE_ACCESS_READWRITE 1
+enum FileAccessType {
+	FILE_ACCESS_READ = 0,
+	FILE_ACCESS_READWRITE = 1
+};
 
-#define FILE_QUERY_FILESIZE 0
-#define FILE_QUERY_READONLY 1
-#define FILE_QUERY_ENCRYPTED 2
-#define FILE_QUERY_PERMTABLE 3
+enum FileQueryType {
+	FILE_QUERY_FILESIZE = 0,
+	FILE_QUERY_READONLY = 1,
+	FILE_QUERY_ENCRYPTED = 2,
+	FILE_QUERY_PERMTABLE = 3
+};
 
 struct tagFileObject;
 

@@ -1,22 +1,24 @@
 #pragma once
 #include "../../include/system.h"
 
-#define TTY_COLOR_BLACK         (uint8_t)0 
-#define TTY_COLOR_BLUE          (uint8_t)1 
-#define TTY_COLOR_GREEN         (uint8_t)2 
-#define TTY_COLOR_CYAN          (uint8_t)3 
-#define TTY_COLOR_RED           (uint8_t)4 
-#define TTY_COLOR_MAGENTA       (uint8_t)5 
-#define TTY_COLOR_BROWN         (uint8_t)6 
-#define TTY_COLOR_LIGHT_GREY    (uint8_t)7 
-#define TTY_COLOR_DARK_GREY     (uint8_t)8 
-#define TTY_COLOR_LIGHT_BLUE    (uint8_t)9 
-#define TTY_COLOR_LIGHT_GREEN   (uint8_t)10 
-#define TTY_COLOR_LIGHT_CYAN    (uint8_t)11 
-#define TTY_COLOR_LIGHT_RED     (uint8_t)12 
-#define TTY_COLOR_LIGHT_MAGENTA (uint8_t)13 
-#define TTY_COLOR_LIGHT_BROWN   (uint8_t)14 
-#define TTY_COLOR_WHITE         (uint8_t)15 
+enum TtyVgaColor {
+	TTY_COLOR_BLACK         = (uint8_t)0, 
+	TTY_COLOR_BLUE          = (uint8_t)1, 
+	TTY_COLOR_GREEN         = (uint8_t)2, 
+	TTY_COLOR_CYAN          = (uint8_t)3, 
+	TTY_COLOR_RED           = (uint8_t)4, 
+	TTY_COLOR_MAGENTA       = (uint8_t)5, 
+	TTY_COLOR_BROWN         = (uint8_t)6, 
+	TTY_COLOR_LIGHT_GREY    = (uint8_t)7, 
+	TTY_COLOR_DARK_GREY     = (uint8_t)8, 
+	TTY_COLOR_LIGHT_BLUE    = (uint8_t)9, 
+	TTY_COLOR_LIGHT_GREEN   = (uint8_t)10, 
+	TTY_COLOR_LIGHT_CYAN    = (uint8_t)11, 
+	TTY_COLOR_LIGHT_RED     = (uint8_t)12, 
+	TTY_COLOR_LIGHT_MAGENTA = (uint8_t)13, 
+	TTY_COLOR_LIGHT_BROWN   = (uint8_t)14, 
+	TTY_COLOR_WHITE         = (uint8_t)15 
+};
 
 #define TTY_DEFAULT_BACK TTY_COLOR_BLACK
 #define TTY_DEFAULT_FORE TTY_COLOR_LIGHT_GREY
@@ -33,7 +35,7 @@ uint8_t tty_cursory;
 uint8_t tty_color;
 
 char TtyMgrGetCharacterAt(uint8_t x, uint8_t y);
-void TtyMgrSetCursorPosition(uint8_t x, uint8_t y, char c);
+void TtyMgrSetCharacterAt(uint8_t x, uint8_t y, char c);
 void TtyMgrPutCharacter(char c);
 void TtyMgrMoveCursor(uint8_t x, uint8_t y);
 void TtyMgrScrollTerminal();

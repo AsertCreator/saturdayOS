@@ -34,45 +34,47 @@ void StdStringConcat(const char* str0, const char* str1, char* dst) {
         i++;
     }
 }
-void StdStringReverse(char* str, int len)
-{
-    int i, temp;
-    for (i = 0; i < len / 2; i++)
-    {
-        temp = str[i];
-        str[i] = str[len - i - 1];
-        str[len - i - 1] = temp;
+void StdStringReverse(char* str, int len) {
+    int start = 0;
+    int end = len - 1;
+    while (start < end) {
+        char temp = str[start];
+        str[start] = str[end];
+        str[end] = temp;
+        end--;
+        start++;
     }
 }
-char* StdLongToString(long num, char* str, int base, bool t)
-{
+char* StdLongToString(int64_t num, char* str, int base) {
     int i = 0;
     bool isNegative = false;
-    if (num == 0)
-    {
+
+    if (num == 0) {
         str[i++] = '0';
-        if (t)
-            str[i] = '\0';
+        str[i] = '\0';
         return str;
     }
-    if (num < 0 && base == 10)
-    {
+
+    if (num < 0 && base == 10) {
         isNegative = true;
         num = -num;
     }
-    while (num != 0)
-    {
+
+    while (num != 0) {
         int rem = num % base;
         str[i++] = (rem > 9) ? (rem - 10) + 'A' : rem + '0';
         num = num / base;
     }
+
     if (isNegative)
         str[i++] = '-';
-    if (t)
-        str[i++] = '\0';
+
+    str[i] = '\0';
+
     StdStringReverse(str, i);
+
     return str;
 }
 char* StdIntToString(int num, char* str, int base) {
-    return StdLongToString((long)num, str, base, true);
+    return StdLongToString((int64_t)num, str, base);
 }

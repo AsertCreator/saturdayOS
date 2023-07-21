@@ -7,4 +7,4 @@ size_t StdStringLength(const char* str);
 void StdStringConcat(const char* str0, const char* str1, char* dst);
 void StdStringReverse(char* str, int len);
 char* StdIntToString(int num, char* str, int base);
-char* StdLongToString(long num, char* str, int base, bool t);
+char* StdLongToString(int64_t num, char* str, int base);

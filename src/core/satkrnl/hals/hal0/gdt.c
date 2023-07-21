@@ -27,4 +27,6 @@ void HALInitializeGDT()
     HALSetGDTEntry(4, 0, 0xFFFFFFFF, 0xF2, 0xCF);
 
     HALInstallLocalGDT();
+
+    DbgPrintStacktrace();
 }

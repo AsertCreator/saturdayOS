@@ -16,7 +16,7 @@ void TtyMgrInitialize() {
 	tty_buffer = (uint16_t*)0xB8000;
 	TtyMgrClearTerminal();
 }
-void TtyMgrSetCursorPosition(uint8_t x, uint8_t y, char c) {
+void TtyMgrSetCharacterAt(uint8_t x, uint8_t y, char c) {
 	const size_t index = y * tty_sizex + x;
 	tty_buffer[index] = vga_entry(c, tty_color);
 }
@@ -25,17 +25,26 @@ char TtyMgrGetCharacterAt(uint8_t x, uint8_t y) {
 	return vga_entry_char(tty_buffer[index]);
 }
 void TtyMgrPutCharacter(char c) {
+	static SerialPort* port = 0;
+	if (port == 0) port = HALGetSerialPortNumbered(0);
+
+	char ch[2];
+	ch[0] = c;
+	ch[1] = 0;
+
 	if (c == '\n') {
 		tty_cursorx = 0;
-		TtyMgrScrollTerminal();
+		tty_cursory++;
+		HALWriteSerialPortString("\r\n", port);
 		return;
 	}
-	TtyMgrSetCursorPosition(tty_cursorx, tty_cursory, c);
-	if (++tty_cursorx == tty_sizex) {
+	TtyMgrSetCharacterAt(tty_cursorx, tty_cursory, c);
+	if (++tty_cursorx >= tty_sizex) {
 		tty_cursorx = 0;
-		if (++tty_cursory == tty_sizey)
+		if (++tty_cursory >= tty_sizey)
 			TtyMgrScrollTerminal();
 	}
+	HALWriteSerialPortString(ch, port);
 }
 void TtyMgrMoveCursor(uint8_t x, uint8_t y) {
 	uint16_t pos = y * tty_sizex + x;
@@ -45,24 +54,23 @@ void TtyMgrMoveCursor(uint8_t x, uint8_t y) {
 	HALOutputToPort(0x3D5, (uint8_t)((pos >> 8) & 0xFF));
 }
 void TtyMgrScrollTerminal() {
-	if (tty_cursory < tty_sizey) {
-		tty_cursory++;
-	}
-	else {
-		TtyMgrClearTerminal();
-	}
+	// StdCopyMemory(tty_buffer, tty_buffer + tty_sizex * 2, tty_sizex * 2 * (tty_sizey - 1));
+	// TtyMgrClearLine(tty_sizey - 1);
+	// tty_cursory -= 1;
+	// TtyMgrMoveCursor(tty_cursorx, tty_cursory);
+	TtyMgrClearTerminal();
 }
 void TtyMgrClearLine(int line) {
-	size_t index = (line - 1) * tty_sizex;
+	size_t index = line * tty_sizex;
 	for (size_t x = 0; x < tty_sizex; ++x) {
-		tty_buffer[index + x] = vga_entry(' ', tty_color);
+		tty_buffer[index + x] = vga_entry(0, tty_color);
 	}
 }
 void TtyMgrClearTerminal() {
 	for (size_t y = 0; y < tty_sizey; y++) {
 		for (size_t x = 0; x < tty_sizex; x++) {
 			size_t index = y * tty_sizex + x;
-			tty_buffer[index] = vga_entry(' ', tty_color);
+			tty_buffer[index] = vga_entry(0, tty_color);
 		}
 	}
 	tty_cursorx = 0;

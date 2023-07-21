@@ -29,7 +29,7 @@ void vprintf(const char* fmt, va_list list) {
 			case 'x': { // not posix // print number as hexadecimal
 				char c[8];
 				StdFillMemory(c, '0', 8);
-				printf(StdLongToString((long)va_arg(list, int), c, 16, false));
+				printf(StdIntToString(va_arg(list, int), c, 16));
 				break;
 			}
 			case 'b': { // not posix // print boolean value

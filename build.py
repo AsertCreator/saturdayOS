@@ -186,9 +186,9 @@ class MakeEngine32:
 					
 					shutil.copy("src/" + config, "build" + str(self.arch) + "/iso/");
 
-					cmd = """xorriso -as mkisofs -b limine-cd.bin \
+					cmd = """xorriso -as mkisofs -b limine-bios-cd.bin \
 -no-emul-boot -boot-load-size 4 -boot-info-table \
---efi-boot limine-cd-efi.bin -efi-boot-part \
+--efi-boot limine-uefi-cd.bin -efi-boot-part \
 --efi-boot-image --protective-msdos-label \
 -o """ + "./build" + str(self.arch) + "/os_build.iso" + " ./build" + str(self.arch) + "/iso"
 
@@ -217,11 +217,15 @@ class StartEngine32:
 		self.iso = iso
 
 	def run(self):
-		qemuargs = ("qemu-system-" + self.qemu + " -m " + str(self.memory) + " -cdrom " + self.iso + ((" -pflash " + self.bios) if self.bios is not None else " "));
+		qemuargs = ("qemu-system-" + self.qemu + " -m " + str(self.memory) + " -cdrom " + self.iso + ((" -pflash " + self.bios) if self.bios is not None else " ") + " -serial stdio");
+		
+		if "debug" in sys.argv:
+			qemuargs += " -S -gdb tcp::1234 ";
+		
 		print("exeucting qemu with args : " + qemuargs);
 
 		if os.system(qemuargs) == 0:
-			print("qemu stopped successfully! i'm hoping you had fun using freshly baked saturdayOS!");
+			print("qemu stopped successfully!");
 		else:
 			print("uh-oh, qemu has crashed!");
 
@@ -236,14 +240,15 @@ if __name__ == "__main__":
 	settings["id"] = "src/sdk/"
 
 	if "clean" not in sys.argv:
-		rootptr = mkengine.readfile("src/pointer.txt");
-		if "--arch" in sys.argv:
-			mkengine.arch = int(sys.argv[sys.argv.index("--arch") + 1])
-		mkengine.makefullstruct();
-		mkengine.processpointer(rootptr, "src", settings);
-		print("built successfully")
+		if "justrun" not in sys.argv:
+			rootptr = mkengine.readfile("src/pointer.txt");
+			if "--arch" in sys.argv:
+				mkengine.arch = int(sys.argv[sys.argv.index("--arch") + 1])
+			mkengine.makefullstruct();
+			mkengine.processpointer(rootptr, "src", settings);
+			print("built successfully")
 
-		if "run" in sys.argv:
+		if "run" in sys.argv or "justrun" in sys.argv:
 			stengine = StartEngine32("./build" + str(mkengine.arch) + "/os_build.iso", "\"C:/Program Files/qemu/share/edk2-i386-code.fd\"" if mkengine.arch % 2 != 0 else None);
 			stengine.run();
 	else:
