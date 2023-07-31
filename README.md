@@ -3,7 +3,7 @@ Almost written-from-scratch operating system for x86 PCs (arm is coming soon).
 I think name is because I study 6 days a week (lol). And it's written on C.
 
 ## Project State
-Currently system is at version 0.1.0. 
+Currently system is at version 0.2.0. 
 
 ### Who is developing project?
 Me, but you can join in. Any contribution is welcomed! I don't have work email, send PRs
