@@ -53,7 +53,8 @@ status ExCreateStandaloneThreadEx(const char* name, RegisterContext ctx, /*out*/
 	obj->ctx = ctx;
 	obj->paused = true;
 
-	*out = obj;
+	if (out != NULL)
+		*out = obj;
 
 	return SUCCESS;
 }
@@ -64,7 +65,8 @@ status ExCreateThread(const char* name, ThreadEntry entry, uint32_t stacksize, /
 
 	if (result != SUCCESS) return result;
 
-	*out = obj;
+	if (out != NULL)
+		*out = obj;
 
 	if (current_thread == 0) {
 		first_thread = obj;

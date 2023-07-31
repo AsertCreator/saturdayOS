@@ -4,6 +4,9 @@ ThreadObject* current_thread = 0;
 ThreadObject* first_thread = 0;
 ThreadObject* last_thread = 0;
 
+static bool first_switch = true;
+static int timer = 0;
+
 status HALCreateStandaloneThread(const char* name, ThreadEntry entry, uint32_t stacksize, /*out*/ ThreadObject** out) {
 	ThreadObject* obj = (ThreadObject*)HeapAlloc(&system_heap, sizeof(ThreadObject));
 
@@ -32,37 +35,44 @@ status HALCreateStandaloneThread(const char* name, ThreadEntry entry, uint32_t s
 
 	obj->paused = false;
 
-	*out = obj;
+	if (out != NULL)
+		*out = obj;
 
 	return SUCCESS;
 }
 void HALSwitchThread(RegisterContext* curctx) {
 	HALTimerIRQHandler(curctx);
 
-	current_thread->ctx.eax = curctx->eax;
-	current_thread->ctx.ebx = curctx->ebx;
-	current_thread->ctx.ecx = curctx->ecx;
-	current_thread->ctx.edx = curctx->edx;
-	current_thread->ctx.esi = curctx->esi;
-	current_thread->ctx.edi = curctx->edi;
-	current_thread->ctx.esp = curctx->esp;
-	current_thread->ctx.ebp = curctx->ebp;
-	current_thread->ctx.eip = curctx->eip;
-	current_thread->ctx.eflags = curctx->eflags;
+	if (timer++ % 4 == 0) {
+		if (!first_switch) {
+			current_thread->ctx.eax = curctx->eax;
+			current_thread->ctx.ebx = curctx->ebx;
+			current_thread->ctx.ecx = curctx->ecx;
+			current_thread->ctx.edx = curctx->edx;
+			current_thread->ctx.esi = curctx->esi;
+			current_thread->ctx.edi = curctx->edi;
+			current_thread->ctx.esp = curctx->esp;
+			current_thread->ctx.ebp = curctx->ebp;
+			current_thread->ctx.eip = curctx->eip;
+			current_thread->ctx.eflags = curctx->eflags;
+		}
 
-retry:
-	current_thread = current_thread->next;
-	if (current_thread->paused)
-		goto retry;
+		first_switch = false;
 
-	curctx->eax = current_thread->ctx.eax;
-	curctx->ebx = current_thread->ctx.ebx;
-	curctx->ecx = current_thread->ctx.ecx;
-	curctx->edx = current_thread->ctx.edx;
-	curctx->esi = current_thread->ctx.esi;
-	curctx->edi = current_thread->ctx.edi;
-	curctx->esp = current_thread->ctx.esp;
-	curctx->ebp = current_thread->ctx.ebp;
-	curctx->eip = current_thread->ctx.eip;
-	curctx->eflags = current_thread->ctx.eflags;
+	retry:
+		current_thread = current_thread->next;
+		if (current_thread->paused)
+			goto retry;
+
+		curctx->eax = current_thread->ctx.eax;
+		curctx->ebx = current_thread->ctx.ebx;
+		curctx->ecx = current_thread->ctx.ecx;
+		curctx->edx = current_thread->ctx.edx;
+		curctx->esi = current_thread->ctx.esi;
+		curctx->edi = current_thread->ctx.edi;
+		curctx->esp = current_thread->ctx.esp;
+		curctx->ebp = current_thread->ctx.ebp;
+		curctx->eip = current_thread->ctx.eip;
+		curctx->eflags = current_thread->ctx.eflags;
+	}
 }

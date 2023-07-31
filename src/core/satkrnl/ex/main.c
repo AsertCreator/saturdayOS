@@ -143,6 +143,8 @@ void BspMgrEntrypoint(struct multiboot_tag* header, uint32_t magic) {
     ThreadObject* thread;
     status threadstatus = ExCreateThread("saturdayOS Kernel", BspMgrEntrypoint2, 2 * 1024, &thread);
 
+    DEBUG_HEX((uint32_t)BspMgrEntrypoint2);
+    
     if (DID_FAIL(threadstatus) && threadstatus == FAILED_OUTOFMM) {
         ExIssuePanic("couldn't create kernel thread, out of memory", (uint32_t)threadstatus);
     }
@@ -162,6 +164,8 @@ void BspMgrEntrypoint(struct multiboot_tag* header, uint32_t magic) {
     // scheduler won't return to this chain. ever.
 }
 void BspMgrEntrypoint2() {
+    DEBUG;
+
     // system is not initialized at this moment
     // almost every API is not working there
 
