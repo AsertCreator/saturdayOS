@@ -1,0 +1,1 @@
+this folder contains source code of saturdayOS core.

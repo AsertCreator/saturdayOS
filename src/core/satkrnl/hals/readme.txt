@@ -1,0 +1,1 @@
+this folder cotains hals (hardware abstraction layer). these are made for specific platforms.
