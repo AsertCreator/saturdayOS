@@ -1,4 +1,5 @@
 #include "../include/irq.h"
+#include "include/idt.h"
 
 /* This array is actually an array of function pointers. We use
 *  this to handle custom IRQ handlers for a given IRQ */

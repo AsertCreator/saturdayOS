@@ -36,14 +36,18 @@ void TtyMgrPutCharacter(char c) {
 		tty_cursorx = 0;
 		tty_cursory++;
 		HALWriteSerialPortString("\r\n", port);
+
+		if (++tty_cursory >= tty_sizey - 1)
+			TtyMgrScrollTerminal();
+
 		return;
 	}
+
 	TtyMgrSetCharacterAt(tty_cursorx, tty_cursory, c);
-	if (++tty_cursorx >= tty_sizex) {
+
+	if (++tty_cursorx >= tty_sizex)
 		tty_cursorx = 0;
-		if (++tty_cursory >= tty_sizey)
-			TtyMgrScrollTerminal();
-	}
+
 	HALWriteSerialPortString(ch, port);
 }
 void TtyMgrMoveCursor(uint8_t x, uint8_t y) {
@@ -54,11 +58,14 @@ void TtyMgrMoveCursor(uint8_t x, uint8_t y) {
 	HALOutputToPort(0x3D5, (uint8_t)((pos >> 8) & 0xFF));
 }
 void TtyMgrScrollTerminal() {
-	// StdCopyMemory(tty_buffer, tty_buffer + tty_sizex * 2, tty_sizex * 2 * (tty_sizey - 1));
-	// TtyMgrClearLine(tty_sizey - 1);
-	// tty_cursory -= 1;
-	// TtyMgrMoveCursor(tty_cursorx, tty_cursory);
-	TtyMgrClearTerminal();
+	ENTER_CRITICAL_ZONE;
+
+	StdCopyMemory(tty_buffer, tty_buffer + (tty_sizex * 2), (tty_sizex * 2) * (tty_sizey - 2));
+	StdFillMemory(tty_buffer + (tty_sizex * 2) * (tty_sizey - 1), 0, tty_sizex * 2);
+
+	// this shit doesn't let me to chnage the code. it triple faults. almost as it qemu fault
+
+	LEAVE_CRITICAL_ZONE;
 }
 void TtyMgrClearLine(int line) {
 	size_t index = line * tty_sizex;
@@ -75,21 +82,4 @@ void TtyMgrClearTerminal() {
 	}
 	tty_cursorx = 0;
 	tty_cursory = 0;
-}
-void TtyMgrLog(status st, const char* com, const char* fmt, ...) {
-	va_list vl;
-
-	if (DID_FAIL(st))
-		tty_color = vga_entry_color(TTY_COLOR_RED, TTY_COLOR_BLACK);
-	else
-		tty_color = vga_entry_color(TTY_COLOR_WHITE, TTY_COLOR_BLACK);
-
-	printf("[%s] ", com);
-
-	tty_color = vga_entry_color(TTY_COLOR_LIGHT_GREY, TTY_COLOR_BLACK);
-	va_start(vl, fmt);
-	vprintf(fmt, vl);
-	va_end(vl);
-
-	printf("\n");
 }

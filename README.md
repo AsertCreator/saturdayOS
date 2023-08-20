@@ -3,7 +3,7 @@ Almost written-from-scratch operating system for x86 PCs (arm is coming soon).
 I think name is because I study 6 days a week (lol). And it's written on C.
 
 ## Project State
-Currently system is at version 0.2.0. 
+Currently system is at version 0.3.0. 
 
 ### Who is developing project?
 Me, but you can join in. Any contribution is welcomed! I don't have work email, send PRs
@@ -18,17 +18,13 @@ instead.
 
 **Q**: How to modify the OS?<br/>
 **A**: saturdayOS build system uses makefile-like files called `pointer.txt`s. These are 
-little scripts describing what build system must do. Currently no docs, cus I have no time,
-you can read build system code itself.
+little scripts describing what build system must do. Currently no docs, because I have no 
+time, you can read build script code.
 
 **Q**: How to compile it?<br/>
-**A**: As mentioned before, use GCC/Clang to compile the OS. To actually compile the OS,
-execute `build.py` Python script. It's the aforementioned build system! Apparently saturdayOS numbers CPU 
-architectures. 0 is x86-32 (BIOS) and 1 is x86-32 (UEFI). You can specify your desired architecture using
-`--arch` argument. "But it doesn't run the OS! What do I do?". In `build[arch number]`
-folder there's should be `os_image.iso` file which contains Live CD version of the OS. Plug
-it into QEMU and done! But you like automatization like me, pass `run` argument to aforementioned
-script, and it will automatically run QEMU. QEMU must be in `PATH`.
+**A**: Run `build.py` script with Python 3. Resulting Live CD can be found in build-\<arch name\>. 
+By default, it builds system for i386. You can provide `--arch <arch name>` argument to build for 
+another architecture. If you want for it to automatically run QEMU, pass `run` option.
 
 
 **Q**: Minimum system requirements?<br/>

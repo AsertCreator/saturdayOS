@@ -2,7 +2,7 @@
 #include "../../include/system.h"
 
 #define HEAP_INIT_SIZE 0x10000
-#define HEAP_MAX_SIZE 0x100000
+#define HEAP_MAX_SIZE 0x1000000
 #define HEAP_MIN_SIZE 0x10000
 
 #define MIN_ALLOC_SZ 4

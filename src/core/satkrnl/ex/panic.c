@@ -1,7 +1,7 @@
 #include "include/panic.h"
 
-void ExIssuePanic(const char* msg, uint32_t faultaddr) {
-	printf("\n\n!!! panic, msg=\"%s\", faultaddr=%x, cpu=%d !!!\n", msg, faultaddr, 0);
+void ExIssuePanic(const char* msg, uint32_t faultaddr, uint32_t errorcode) {
+	printf("\n\n!!! panic, msg=\"%s\", faultaddr=%d, errorcode=%d, cpu=%d !!!\n", msg, faultaddr, errorcode, 0);
 	printf("please reboot this device\n");
 	ExHaltCPU();
 }

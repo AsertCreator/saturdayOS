@@ -1,5 +1,5 @@
 #pragma once
-#include "../../include/system.h"
+#include "../../../include/system.h"
 
 /* These are function prototypes for all of the exception
 *  handlers: The first 32 entries in the IDT are reserved
@@ -39,4 +39,5 @@ void isr31();
 
 void HALInitializeTraps();
 
+extern uint32_t exception_error_code;
 extern char* exception_messages[];

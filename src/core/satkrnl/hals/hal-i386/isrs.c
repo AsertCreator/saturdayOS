@@ -1,4 +1,5 @@
-#include "../include/isrs.h"
+#include "include/isrs.h"
+#include "include/idt.h"
 
 char* exception_messages[] = {
     "division by zero",
@@ -87,6 +88,6 @@ void HALInitializeTraps() {
 
 void HALHandleFault(RegisterContext* r) {
     if (r->int_no < 32) {
-        ExIssuePanic(exception_messages[r->int_no], r->eip);
+        ExIssuePanic(exception_messages[r->int_no], r->eip, exception_error_code);
     }
 }

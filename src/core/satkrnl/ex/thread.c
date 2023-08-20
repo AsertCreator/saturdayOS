@@ -83,7 +83,10 @@ status ExCreateThread(const char* name, ThreadEntry entry, uint32_t stacksize, /
 	return SUCCESS;
 }
 status ExDestroyThread(ThreadObject* obj) {
-	NEVER_REFERENCED(obj);
+	obj->prev->next = obj->next;
+	obj->next->prev = obj->prev;
+
+	HeapFree(&system_heap, obj);
 	return SUCCESS;
 }
 status ExResumeThread(ThreadObject* obj) {

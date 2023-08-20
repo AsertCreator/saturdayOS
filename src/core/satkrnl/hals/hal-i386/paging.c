@@ -3,8 +3,14 @@
 uint32_t page_directory[PAGE_DIR_SIZE] __attribute__((aligned(4096)));
 uint32_t page_table[PAGE_TBL_SIZE][PAGE_DIR_SIZE] __attribute__((aligned(4096)));
 
+static void IdentityMap(uint32_t* first_pte, uint32_t from, uint32_t size) {
+    from = from & 0xfffff000; // discard bits we don't want
+    for (; size > 0; from += 4096, size -= 4096, first_pte++) {
+        *first_pte = from | 1;     // mark page present.
+    }
+}
+
 void HALInitializePaging() {
-    // identity page entire memory
     int j = 0;
     for (int i = 0; i < PAGE_DIR_SIZE; i++) {
         for (; j < PAGE_TBL_SIZE; j++) {
@@ -13,6 +19,8 @@ void HALInitializePaging() {
         }
         page_directory[i] = (uint32_t)&(page_table[i]) | 3;
     }
+
+    IdentityMap(&(page_table[0][0]), 0, 64 * 1024 * 1024);
 
     HALLoadCR3((uint32_t)page_directory);
     HALStartupPaging();

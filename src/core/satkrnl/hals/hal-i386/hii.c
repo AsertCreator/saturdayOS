@@ -54,10 +54,10 @@ void HALKeyboardHandler(RegisterContext *r) {
 }
 status HALInitializeHumanInteraction() {
     if (HALInitializeKeyboard() != SUCCESS) {
-        ExIssuePanic("couldn't initialize keyboard!", 0);
+        ExIssuePanic("couldn't initialize keyboard!", 0, 0);
     }
     if (HALInitializeMouse() != SUCCESS) {
-        ExIssuePanic("couldn't initialize mouse!", 0);
+        ExIssuePanic("couldn't initialize mouse!", 0, 0);
     }
     return SUCCESS;
 }

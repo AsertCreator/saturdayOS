@@ -1,4 +1,3 @@
 preserveobj
 compilefile *
-compile hal0 if arch is 0
-compile hal1 if arch is 1
+compile hal-i386 if arch is i386

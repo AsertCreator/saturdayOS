@@ -1,5 +1,5 @@
 #pragma once
-#include "../../include/system.h"
+#include "../../../include/system.h"
 
 // IDTEntry "<-" SystemObject
 typedef struct

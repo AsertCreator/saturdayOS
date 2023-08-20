@@ -1,4 +1,5 @@
 #include "../include/power.h"
+#include "include/idt.h"
 
 void HALLateReboot() {
 	// todo: implement normal reboot

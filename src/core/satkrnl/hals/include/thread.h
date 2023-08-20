@@ -13,6 +13,7 @@ typedef struct tagThreadObject {
 	RegisterContext ctx;
 	bool paused;
 	void* aux;
+	struct tagThreadObject* prev;
 	struct tagThreadObject* next;
 } ThreadObject;
 

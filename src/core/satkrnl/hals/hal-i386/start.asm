@@ -151,30 +151,35 @@ isr9:
 ; 10: Bad TSS Exception (With Error Code!)
 isr10:
     cli
+    pop dword [exception_error_code]
     push byte 10
     jmp isr_common_stub
 
 ; 11: Segment Not Present Exception (With Error Code!)
 isr11:
     cli
+    pop dword [exception_error_code]
     push byte 11
     jmp isr_common_stub
 
 ; 12: Stack Fault Exception (With Error Code!)
 isr12:
     cli
+    pop dword [exception_error_code]
     push byte 12
     jmp isr_common_stub
 
 ; 13: General Protection Fault Exception (With Error Code!)
 isr13:
     cli
+    pop dword [exception_error_code]
     push byte 13
     jmp isr_common_stub
 
 ; 14: Page Fault Exception (With Error Code!)
 isr14:
     cli
+    pop dword [exception_error_code]
     push byte 14
     jmp isr_common_stub
 
@@ -520,6 +525,11 @@ HALGetCPUFlags:
     pop eax
     ret
 
+section .data
+
+exception_error_code: dd 0
+
+global exception_error_code
 global HALGetCPUFlags
 
 section .multiboot

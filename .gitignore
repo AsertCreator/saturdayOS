@@ -5,4 +5,5 @@ x86/
 x64/
 *.o
 *.iso
+.time.txt
 build*/

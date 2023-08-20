@@ -22,54 +22,13 @@ HeapObject BspMgrInitializeSystemHeap(void* at) {
     return newheap;
 }
 
-void BspMgrInitializeHAL() {
-    ENTER_CRITICAL_ZONE;
-
-    TtyMgrLog(SUCCESS, "bspmgr", "initializing hal...");
-
-#if ARCH == 0
-    TtyMgrLog(SUCCESS, "bspmgr", "initializing gdt...");
-    HALInitializeGDT();
-
-    TtyMgrLog(SUCCESS, "bspmgr", "initializing idt...");
-    HALInitializeIDT();
-#endif
-
-    TtyMgrLog(SUCCESS, "bspmgr", "initializing traps...");
-    HALInitializeTraps();
-
-    TtyMgrLog(SUCCESS, "bspmgr", "initializing irq...");
-    HALInitializeInterrupts();
-
-    // TtyMgrLog("bspmgr", "initializing paging...");
-    // HALInitializePaging();
-
-    // TtyMgrLog(SUCCESS, "bspmgr", "initializing timer...");
-    // HALInitializeSystemTimer();
-
-    TtyMgrLog(SUCCESS, "bspmgr", "initializing pci...");
-    HALPciScanEverything();
-
-    // TtyMgrLog(SUCCESS, "bspmgr", "initializing devmgr...");
-    // DevMgrInitialize();
-
-    // human interaction interface
-    if (HALInitializeHumanInteraction() != 0) {
-        ExIssuePanic("unexpected error occurred during hii initialization!", 0);
-    }
-
-    LEAVE_CRITICAL_ZONE;
-
-    TtyMgrLog(SUCCESS, "bspmgr", "initialized hal");
-}
-
 void BspMgrInitializeEx() {
-    TtyMgrLog(SUCCESS, "bspmgr", "initializing executive...");
+    TtyMgrLog(SUCCESS, "ex", "initializing executive...");
 
     ExPrepareUsermode();
     ExSetupSyscalls();
 
-    TtyMgrLog(SUCCESS, "bspmgr", "initialized executive...");
+    TtyMgrLog(SUCCESS, "ex", "initialized executive...");
 }
 
 void BspMgrEntrypoint(struct multiboot_tag* header, uint32_t magic) {
@@ -95,9 +54,7 @@ void BspMgrEntrypoint(struct multiboot_tag* header, uint32_t magic) {
     struct multiboot_tag* tag;
     struct multiboot_tag_framebuffer* fb;
     struct multiboot_tag_string* str;
-#if ARCH == 1
     struct multiboot_tag_efi32* e32;
-#endif
 
     for (tag = (struct multiboot_tag*)(addr + 8);
         tag->type != MULTIBOOT_TAG_TYPE_END;
@@ -115,30 +72,20 @@ void BspMgrEntrypoint(struct multiboot_tag* header, uint32_t magic) {
             TtyMgrLog(SUCCESS, "bspmgr", "booted by: %s", str->string);
             break;
         case MULTIBOOT_TAG_TYPE_EFI32:
-#if ARCH == 0
-            TtyMgrLog(FAILED_NOTIMPL, "bspmgr", "probably booted on uefi. make sure you are using correct kernel, cause this is bios kernel");
-            ExHaltCPU();
-#elif ARCH == 1
             e32 = (struct multiboot_tag_efi32*)tag;
-#endif
             break;
         default:
             break;
         }
     }
 
-#if ARCH == 1
-    efi_system_table_t* st = (efi_system_table_t*)e32->pointer;
-    st->ConOut->OutputString(st->ConsoleOutHandle, L"jk");
-    for (;;);
-#endif
-
+    NEVER_REFERENCED(e32);
     NEVER_REFERENCED(fb);
 
     system_heap = BspMgrInitializeSystemHeap((void*)(16 * 1024 * 1024));
     // heap works there
 
-    BspMgrInitializeHAL();
+    HALInitialize();
 
     ThreadObject* thread;
     status threadstatus = ExCreateThread("saturdayOS Kernel", BspMgrEntrypoint2, 2 * 1024, &thread);
@@ -146,10 +93,10 @@ void BspMgrEntrypoint(struct multiboot_tag* header, uint32_t magic) {
     DEBUG_HEX((uint32_t)BspMgrEntrypoint2);
     
     if (DID_FAIL(threadstatus) && threadstatus == FAILED_OUTOFMM) {
-        ExIssuePanic("couldn't create kernel thread, out of memory", (uint32_t)threadstatus);
+        ExIssuePanic("couldn't create kernel thread, out of memory", 0, (uint32_t)threadstatus);
     }
     else if (DID_FAIL(threadstatus)) {
-        ExIssuePanic("couldn't create kernel thread, unknown error", (uint32_t)threadstatus);
+        ExIssuePanic("couldn't create kernel thread, unknown error", 0, (uint32_t)threadstatus);
     }
 
     TtyMgrLog(SUCCESS, "bspmgr", "initializing threading...");
@@ -161,7 +108,7 @@ void BspMgrEntrypoint(struct multiboot_tag* header, uint32_t magic) {
     // threads work here
 
     while (true) { }
-    // scheduler won't return to this chain. ever.
+    // scheduler won't return to this control flow. ever.
 }
 void BspMgrEntrypoint2() {
     DEBUG;
@@ -176,6 +123,8 @@ void BspMgrEntrypoint2() {
     TtyMgrLog(SUCCESS, "bspmgr", "starting shell manager...");
 
     // ExStartProcess("FS0:/system/shmgr");
+
+    ASSERT((int)("it should crash. if you see this, then good") == -1);
 
     for (;;);
 

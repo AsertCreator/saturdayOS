@@ -20,12 +20,13 @@ class MakeEngine32:
 	def __init__(self):
 		self.sourceext = [".c", ".cpp", ".cxx", ".c++", ".asm", ".s"];
 		self.output = "";
-		self.arch = 0;
+		self.arch = "i386";
 		self.struct = None;
+		self.tempfd = None;
 
 	def clean(self):
-		shutil.rmtree("build" + str(self.arch));
-		os.mkdir("build" + str(self.arch));
+		shutil.rmtree("build-" + str(self.arch));
+		os.mkdir("build-" + str(self.arch));
 
 	def readfile(self, file):
 		fd = open(file);
@@ -50,32 +51,38 @@ class MakeEngine32:
 					break;
 		return res;
 
-	def compilefile(self, file, outdir, settings, link):
+	def compilefile(self, file, outdir, settings, link, lasttimemod):
 		obj = None;
-		for ext in self.sourceext:
-			if ext in file:
-				obj = file.replace(ext, ".o").replace("src/", outdir) if link else file.replace(ext, "").replace("src/", outdir);
-				self.mkdirut(os.path.dirname(obj))
+		if os.path.getmtime(file) != lasttimemod:
+			for ext in self.sourceext:
+				if ext in file:
+					obj = file.replace(ext, ".o").replace("src/", outdir) if link else file.replace(ext, "").replace("src/", outdir);
+					self.mkdirut(os.path.dirname(obj))
 
-				if ext == ".asm":
-					if os.system("nasm -felf32 -o " + obj + " " + file) == 0:
-						print(bcolors.OKCYAN + "\tcompiled file " + file + bcolors.ENDC);
-					else:
-						print(bcolors.FAIL + "\tfailed to compile file " + file + bcolors.ENDC);
-						return -1;
-				elif ext == ".c":
-					if os.system(settings["compiler"] + " -Wall -Wextra -Werror -fms-extensions -nostdlib -o " + obj + " " + file + " -ffreestanding -mgeneral-regs-only -mno-red-zone -O0" + (" -s" if "--preserve-symbols" not in sys.argv else "") + (" -c" if link else "") + " -I " + settings["id"] + " -DARCH=" + str(self.arch)) == 0:
-						print(bcolors.OKCYAN + "\tcompiled file " + file + bcolors.ENDC);
-					else:
-						print(bcolors.FAIL + "\tfailed to compile file " + file + bcolors.ENDC);
-						return -1;
-				elif ext == ".cpp":
-					if os.system(settings["compiler"] + " -Wall -Wextra -Werror -fms-extensions -nostdlib  -o " + obj + " " + file + " -ffreestanding -mgeneral-regs-only -mno-red-zone -fno-exceptions -fno-asynchronous-unwind-tables -O0" + ("-s" if "--preserve-symbols" not in sys.argv else "") + (" -c" if link else "") + " -I " + settings["id"] + " -DARCH=" + str(self.arch)) == 0:
-						print(bcolors.OKCYAN + "\tcompiled file " + file + bcolors.ENDC);
-					else:
-						print(bcolors.FAIL + "\tfailed to compile file " + file + bcolors.ENDC);
-						return -1;
-				break;
+					if ext == ".asm":
+						if os.system("nasm -felf32 -o " + obj + " " + file) == 0:
+							print(bcolors.OKCYAN + "\tcompiled file " + file + bcolors.ENDC);
+						else:
+							print(bcolors.FAIL + "\tfailed to compile file " + file + bcolors.ENDC);
+							return -1;
+					elif ext == ".c":
+						if os.system(settings["compiler"] + " -Wall -Wextra -Werror -fms-extensions -nostdlib -o " + obj + " " + file + " -ffreestanding -mgeneral-regs-only -mno-red-zone -O0" + (" -s" if "--preserve-symbols" not in sys.argv else "") + (" -c" if link else "") + " -I " + settings["id"] + " -DARCH=" + str(self.arch)) == 0:
+							print(bcolors.OKCYAN + "\tcompiled file " + file + bcolors.ENDC);
+						else:
+							print(bcolors.FAIL + "\tfailed to compile file " + file + bcolors.ENDC);
+							return -1;
+					elif ext == ".cpp":
+						if os.system(settings["compiler"] + " -Wall -Wextra -Werror -fms-extensions -nostdlib  -o " + obj + " " + file + " -ffreestanding -mgeneral-regs-only -mno-red-zone -fno-exceptions -fno-asynchronous-unwind-tables -O0" + ("-s" if "--preserve-symbols" not in sys.argv else "") + (" -c" if link else "") + " -I " + settings["id"] + " -DARCH=" + str(self.arch)) == 0:
+							print(bcolors.OKCYAN + "\tcompiled file " + file + bcolors.ENDC);
+						else:
+							print(bcolors.FAIL + "\tfailed to compile file " + file + bcolors.ENDC);
+							return -1;
+					break;
+		else:
+			for ext in self.sourceext:
+				if ext in file:
+					obj = file.replace(ext, ".o").replace("src/", outdir) if link else file.replace(ext, "").replace("src/", outdir);
+			
 		return obj;
 
 	def linkfiles(self, files, out, settings):
@@ -99,14 +106,14 @@ class MakeEngine32:
 			except: pass;
 
 	def makefullstruct(self):
-		try: os.mkdir("build" + str(self.arch) + "/" + "iso"); 
+		try: os.mkdir("build-" + str(self.arch) + "/" + "iso"); 
 		except: pass;
 
 		file = open("src/sdk/systemstruct.json")
 		structure = json.load(file)
 		file.close()
 		for dire in structure["directories"]:
-			try: os.mkdir("build" + str(self.arch) + "/" + "iso/" + dire); 
+			try: os.mkdir("build-" + str(self.arch) + "/" + "iso/" + dire); 
 			except: pass;
 
 		self.struct = structure;
@@ -128,7 +135,7 @@ class MakeEngine32:
 						prop = words[3];
 						exvl = words[5];
 
-						if prop == "arch" and int(exvl) != self.arch:
+						if prop == "arch" and exvl != self.arch:
 							continue
 
 					nptr = self.readfile(curdir + "/" + directory + "/pointer.txt");
@@ -141,61 +148,78 @@ class MakeEngine32:
 					files = self.filtersource(files);
 					files = fnmatch.filter(files, selector);
 					
-					try: os.mkdir("build" + str(self.arch) + "/" + curdir); 
+					try: os.mkdir("build-" + str(self.arch) + "/" + curdir); 
+					except: pass;
+
+					ti = open(curdir + "/.time.txt", "w+");
+					js = {};
+
+					try: js = json.loads(ti.read());
 					except: pass;
 
 					for file in files:
-						objfile = self.compilefile(curdir + "/" + file, "build" + str(self.arch) + "/", settings, True);
+						mtime = 0
+						try: mtime = js[curdir + "/" + file]
+						except: js[curdir + "/" + file] = os.path.getmtime(curdir + "/" + file)
+
+						objfile = self.compilefile(curdir + "/" + file, "build-" + str(self.arch) + "/", settings, True, mtime);
+
 						if objfile == -1:
+							js[curdir + "/" + file] = 0
+							ti.write(json.dumps(js))
+							ti.close()
 							self.fail("couldn't compile file " + file);
 						if objfile != None:
 							objects.append(objfile);
+
+					ti.write(json.dumps(js))
+					ti.close()
 				elif opcode == "compilelink":
 					selector = words[1];
 					files = self.listfiles(curdir);
 					files = self.filtersource(files);
 					files = fnmatch.filter(files, selector);
 					
-					try: os.mkdir("build" + str(self.arch) + "/" + curdir); 
+					try: os.mkdir("build-" + str(self.arch) + "/" + curdir); 
 					except: pass;
 
 					for file in files:
-						linked = self.compilefile(curdir + "/" + file, "build" + str(self.arch) + "/", settings, False);
+						linked = self.compilefile(curdir + "/" + file, "build-" + str(self.arch) + "/", settings, False, 0);
 						if linked == -1:
 							self.fail("couldn't compile file " + file);
 				elif opcode == "linkall":
 					name = words[1];
-					if self.linkfiles(objects, "build" + str(self.arch) + "/" + curdir.replace("src", ".") + "/" + name, settings) == 1:
+					if self.linkfiles(objects, "build-" + str(self.arch) + "/" + curdir.replace("src", ".") + "/" + name, settings) == 1:
 						self.fail("couldn't link program " + name);
-					linked = "build" + str(self.arch) + "/" + curdir.replace("src", ".") + "/" + name;
+					linked = "build-" + str(self.arch) + "/" + curdir.replace("src", ".") + "/" + name;
 				elif opcode == "copyto":
 					to = int(words[1]);
 					if to != -1:
-						shutil.copy(linked, "build" + str(self.arch) + "/iso/" + self.struct["directories"][to]);
+						shutil.copy(linked, "build-" + str(self.arch) + "/iso/" + self.struct["directories"][to]);
 					else:
-						shutil.copy(linked, "build" + str(self.arch) + "/iso/");
+						shutil.copy(linked, "build-" + str(self.arch) + "/iso/");
 				elif opcode == "copyraw":
 					what = words[1];
 					to = int(words[2]);
 					if to != -1:
-						shutil.copy(curdir + "/" + what, "build" + str(self.arch) + "/iso/" + self.struct["directories"][to]);
+						shutil.copy(curdir + "/" + what, "build-" + str(self.arch) + "/iso/" + self.struct["directories"][to]);
 					else:
-						shutil.copy(curdir + "/" + what, "build" + str(self.arch) + "/iso/");
+						shutil.copy(curdir + "/" + what, "build-" + str(self.arch) + "/iso/");
 				elif opcode == "buildlimineiso":
 					config = words[1];
 					
-					shutil.copy("src/" + config, "build" + str(self.arch) + "/iso/");
+					shutil.copy("src/" + config, "build-" + str(self.arch) + "/iso/");
 
 					cmd = """xorriso -as mkisofs -b limine-bios-cd.bin \
 -no-emul-boot -boot-load-size 4 -boot-info-table \
 --efi-boot limine-uefi-cd.bin -efi-boot-part \
 --efi-boot-image --protective-msdos-label \
--o """ + "./build" + str(self.arch) + "/os_build.iso" + " ./build" + str(self.arch) + "/iso"
+-o """ + "./build-" + str(self.arch) + "/os_build.iso" + " ./build-" + str(self.arch) + "/iso"
 
 					if os.system(cmd) != 0:
 						self.fail("couldn't make an iso")
 
-					cmd = ".\src\limine\limine bios-install " + "./build" + str(self.arch) + "/os_build.iso"
+					cmd = ".\src\limine\limine bios-install " + "./build-" + str(self.arch) + "/os_build.iso"
 					if os.system(cmd) != 0:
 						self.fail("couldn't deploy limine to iso")
 				elif opcode == "incdir":
@@ -217,7 +241,7 @@ class StartEngine32:
 		self.iso = iso
 
 	def run(self):
-		qemuargs = ("qemu-system-" + self.qemu + " -m " + str(self.memory) + " -cdrom " + self.iso + ((" -pflash " + self.bios) if self.bios is not None else " ") + " -serial stdio");
+		qemuargs = ("qemu-system-" + self.qemu + " -m " + str(self.memory) + " -cdrom " + self.iso + ((" -pflash " + self.bios) if self.bios is not None else " ") + " -serial stdio -d cpu_reset -no-reboot");
 		
 		if "debug" in sys.argv:
 			qemuargs += " -S -gdb tcp::1234 ";
@@ -243,13 +267,13 @@ if __name__ == "__main__":
 		if "justrun" not in sys.argv:
 			rootptr = mkengine.readfile("src/pointer.txt");
 			if "--arch" in sys.argv:
-				mkengine.arch = int(sys.argv[sys.argv.index("--arch") + 1])
+				mkengine.arch = sys.argv[sys.argv.index("--arch") + 1]
 			mkengine.makefullstruct();
 			mkengine.processpointer(rootptr, "src", settings);
 			print("built successfully")
 
 		if "run" in sys.argv or "justrun" in sys.argv:
-			stengine = StartEngine32("./build" + str(mkengine.arch) + "/os_build.iso", "\"C:/Program Files/qemu/share/edk2-i386-code.fd\"" if mkengine.arch % 2 != 0 else None);
+			stengine = StartEngine32("./build-" + str(mkengine.arch) + "/os_build.iso", "\"C:/Program Files/qemu/share/edk2-i386-code.fd\"" if mkengine.arch.endswith("-efi") else None);
 			stengine.run();
 	else:
 		mkengine.clean();

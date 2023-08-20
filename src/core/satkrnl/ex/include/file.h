@@ -1,48 +1,31 @@
 #pragma once
 #include "../../include/system.h"
 
-enum FileShareType {
-	FILE_SHARE_READ = 0,
-	FILE_SHARE_WRITE = 1,
-	FILE_SHARE_DEL = 2
-};
+// FileVolumeObject <- SystemObject
+typedef struct tagFileVolumeObject {
+	SystemObject;
 
-enum FileAccessType {
-	FILE_ACCESS_READ = 0,
-	FILE_ACCESS_READWRITE = 1
-};
+} FileVolumeObject;
 
-enum FileQueryType {
-	FILE_QUERY_FILESIZE = 0,
-	FILE_QUERY_READONLY = 1,
-	FILE_QUERY_ENCRYPTED = 2,
-	FILE_QUERY_PERMTABLE = 3
-};
+// FileSystemObject <- SystemObject
+typedef struct tagFileSystemObject {
+	SystemObject;
 
-struct tagFileObject;
+} FileSystemObject;
 
-typedef status (*FileObjectRead)(struct tagFileObject* /*this*/, uint8_t* /*buf*/, uint64_t /*start*/, uint64_t /*len*/);
-typedef status (*FileObjectWrite)(struct tagFileObject* /*this*/, uint8_t* /*buf*/, uint64_t /*start*/, uint64_t /*len*/);
-typedef status (*FileObjectClose)(struct tagFileObject* /*this*/);
-typedef status (*FileObjectDelete)(struct tagFileObject* /*this*/);
-typedef status (*FileObjectQuery)(struct tagFileObject* /*this*/, int /*what*/, int* /*out*/);
-
-// FileObject "<-" SystemObject
+// FileObject <- SystemObject
 typedef struct tagFileObject {
+	SystemObject;
+
 	uint64_t fid;
-	const char* path;
-	FileObjectRead read;
-	FileObjectWrite write;
-	FileObjectClose close;
-	FileObjectDelete del;
-	FileObjectQuery query;
-	struct tagFileObject* next;
+	const char* name;
+	char* owner_domain;
+	char* owner_user;
+	SystemObject* aux_object;
 } FileObject;
 
 extern uint64_t file_next_fid;
-extern FileObject file_null;
-extern FileObject* file_first;
-extern FileObject* file_last;
+extern FileObject file_root;
 
 bool ExIsValidFilePath(const char* path);
 FileObject ExCreateNullFile();

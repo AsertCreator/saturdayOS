@@ -5,7 +5,7 @@
 #include <stdarg.h>
 #include <stdbool.h>
 
-// RegisterContext "<-" SystemObject
+// RegisterContext
 typedef struct {
     uint32_t gs, fs, es, ds;
     uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax;
@@ -14,7 +14,9 @@ typedef struct {
 } RegisterContext;
 
 // SystemObject
-typedef struct { } SystemObject;
+typedef struct tagSystemObject { 
+    uint16_t type;
+} SystemObject;
 
 // status <- unsigned int
 typedef uint32_t status;
@@ -36,16 +38,42 @@ typedef uint32_t status;
 #define FAILED_NOTFUND 0x00000007
 #define FAILED_OUTOFMM 0x00000008
 #define FAILED_SKIPPED 0x00000009
+#define FAILED_BADREQT 0x0000000A
+#define FAILED_BADRESP 0x0000000B
 
 #define DID_SUCCESS(x) (x == SUCCESS)
 #define DID_FAIL(x)    (x != SUCCESS)
 
+#define STDOUT -1
+#define STDERR -2
+#define STDIN -3
+#define INVALID -4
+
+#define MODE_READ 'r'
+#define MODE_WRITE 'w'
+#define MODE_APPEND 'a'
+
+typedef uint32_t pid_t;
+typedef uint32_t fd_t;
+
+typedef struct {
+	uint32_t a;
+	uint16_t b;
+	uint16_t c;
+	uint16_t d;
+	uint32_t e;
+	uint16_t f;
+} uuid_t;
+
+#define PERMISSION_CONTROL_UUID { 0x3AF3DD3F, 0xC206, 0x4880, 0xAC04, 0x8C8064CC, 0x1A29 }
+
 #define SATKRNL_VERSION_MAJOR 0
-#define SATKRNL_VERSION_MINOR 2
+#define SATKRNL_VERSION_MINOR 3
 #define SATKRNL_VERSION_PATCH 0
 
 #define DEBUG printf("!!! debug, file: %s, line: %s !!!\n", __FILE__, TO_STRINGX(__LINE__))
 #define DEBUG_HEX(x) printf("!!! debug, file: %s, line: %s, number: %x !!!\n", __FILE__, TO_STRINGX(__LINE__), x)
+#define ASSERT(cond) if (cond) { } else { printf("!!!! assert failed, file: %s, line: %s, condition: %s !!!!\n", __FILE__, TO_STRINGX(__LINE__), TO_STRINGX(cond)); }
 #define NORETURN __attribute__ ((noreturn))
 
 #include "../ex/include/elf.h"
@@ -58,24 +86,21 @@ typedef uint32_t status;
 #include "../hals/include/timer.h"
 #include "../ex/include/panic.h"
 #include "../hals/include/tty.h"
-#include "../hals/include/gdt.h"
-#include "../hals/include/idt.h"
 #include "../hals/include/irq.h"
-#include "../hals/include/isrs.h"
 #include "../hals/include/pci.h"
-#include "../ex/include/convert.h"
+#include "../ex/include/std.h"
 #include "../hals/include/paging.h"
 #include "../hals/include/hii.h"
 #include "../ex/include/mp.h"
 #include "../ex/include/drive.h"
-#include "../hals/include/device.h"
 #include "../hals/include/syscall.h"
-#include "../ex/include/vidtty.h"
 #include "../hals/include/thread.h"
 #include "../ex/include/file.h"
 #include "../hals/include/uefi.h"
 #include "../hals/include/serial.h"
 #include "../hals/include/debug.h"
+#include "../ex/include/process.h"
+#include "../hals/include/init.h"
 
 #include "multiboot.h"
 

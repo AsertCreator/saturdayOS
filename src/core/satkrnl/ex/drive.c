@@ -1,11 +1,7 @@
-#include "../hals/include/device.h"
-
-BlockDeviceObject* boot_drive_device;
-BlockDeviceObject* system_drive_device;
-BlockDeviceObject* user_drive_device;
+#include "../ex/include/drive.h"
 
 void DriveMgrInitialize() {
-	DriveMgrRescanDrives();
+
 }
 void DriveMgrRescanDrives() {
 

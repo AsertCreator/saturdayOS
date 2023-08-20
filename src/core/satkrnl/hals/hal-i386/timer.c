@@ -15,7 +15,3 @@ void HALWaitTicks(uint64_t ticks) {
     uint64_t eticks = timer_ticks + ticks;
     while (timer_ticks < eticks) {}
 }
-
-void HALInitializeSystemTimer() {
-    HALSetIRQHandler(0, HALTimerIRQHandler);
-}

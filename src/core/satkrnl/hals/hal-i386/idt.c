@@ -1,4 +1,4 @@
-#include "../include/idt.h"
+#include "include/idt.h"
 
 IDTEntry idt[256];
 IDTPointer idtp;
