@@ -1,6 +1,0 @@
-copyraw limine-bios-cd.bin 5
-copyraw limine-bios-cd.bin -1
-copyraw limine-uefi-cd.bin -1
-copyraw limine-bios-pxe.bin -1
-copyraw limine-bios.sys 5
-copyraw BOOTIA32.efi 7

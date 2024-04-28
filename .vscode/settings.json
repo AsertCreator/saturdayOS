@@ -1,3 +1,20 @@
 {
-    "C_Cpp.errorSquiggles": "disabled"
+    "C_Cpp.errorSquiggles": "disabled",
+    "files.associations": {
+        "tty.h": "c",
+        "usermode.h": "c",
+        "syscall.h": "c",
+        "serial.h": "c",
+        "power.h": "c",
+        "heap.h": "c",
+        "memory.h": "c",
+        "panic.h": "c",
+        "irq.h": "c",
+        "process.h": "c",
+        "thread.h": "c",
+        "gdt.h": "c",
+        "port.h": "c",
+        "std.h": "c",
+        "timer.h": "c"
+    }
 }

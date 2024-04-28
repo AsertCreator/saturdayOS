@@ -1,3 +1,0 @@
-preserveobj
-compilefile *
-compile hal-i386 if arch is i386

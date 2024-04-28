@@ -1,6 +1,0 @@
-preserveobj
-compile ex
-compile hals
-linkscript kernel.ld
-linkall satkrnl
-copyto 2

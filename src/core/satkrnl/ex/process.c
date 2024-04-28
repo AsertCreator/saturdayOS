@@ -1,4 +1,7 @@
 #include "include/process.h"
+#include "include/memory.h"
+#include "include/heap.h"
+#include "../hals/include/thread.h"
 
 ProcessObject* current_process;
 ProcessObject* kernel_process;

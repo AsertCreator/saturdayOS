@@ -1,5 +1,6 @@
 #include "include/isrs.h"
 #include "include/idt.h"
+#include "../../ex/include/panic.h"
 
 char* exception_messages[] = {
     "division by zero",

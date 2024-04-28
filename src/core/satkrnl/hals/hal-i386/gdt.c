@@ -1,4 +1,5 @@
 #include "include/gdt.h"
+#include "../include/debug.h"
 
 gdt_entry gdt[5];
 gdt_ptr gp;

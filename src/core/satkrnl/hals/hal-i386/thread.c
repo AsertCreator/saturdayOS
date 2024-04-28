@@ -1,4 +1,9 @@
 #include "../include/thread.h"
+#include "../include/timer.h"
+#include "../include/tty.h"
+#include "../../ex/include/std.h"
+#include "../../ex/include/heap.h"
+#include "../../ex/include/memory.h"
 
 ThreadObject* current_thread = 0;
 ThreadObject* first_thread = 0;

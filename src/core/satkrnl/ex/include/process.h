@@ -1,5 +1,5 @@
 #pragma once
-#include "../../include/system.h"
+#include "elf.h"
 
 typedef uint32_t pid_t;
 

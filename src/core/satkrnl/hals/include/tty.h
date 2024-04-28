@@ -27,12 +27,12 @@ enum TtyVgaColor {
 #define vga_entry(uc, color) (uint16_t)uc | (uint16_t)color << 8
 #define vga_entry_char(ent) (char)((ent >> 8) << 8)
 
-uint16_t* tty_buffer;
-uint8_t tty_sizex;
-uint8_t tty_sizey;
-uint8_t tty_cursorx;
-uint8_t tty_cursory;
-uint8_t tty_color;
+extern uint16_t* tty_buffer;
+extern uint8_t tty_sizex;
+extern uint8_t tty_sizey;
+extern uint8_t tty_cursorx;
+extern uint8_t tty_cursory;
+extern uint8_t tty_color;
 
 char TtyMgrGetCharacterAt(uint8_t x, uint8_t y);
 void TtyMgrSetCharacterAt(uint8_t x, uint8_t y, char c);

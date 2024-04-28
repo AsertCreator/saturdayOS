@@ -1,5 +1,0 @@
-preserveobj
-compilefile *
-linkscript app.ld
-linkall shmgr
-copyto 0

@@ -1,4 +1,5 @@
 #include "../include/irq.h"
+#include "../include/port.h"
 #include "include/idt.h"
 
 /* This array is actually an array of function pointers. We use

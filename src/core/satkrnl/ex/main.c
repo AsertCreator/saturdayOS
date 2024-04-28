@@ -2,7 +2,18 @@
     a lot of things here are written by Brandon Friesen
 */
 
-#include "../include/system.h"
+#include "include/memory.h"
+#include "include/panic.h"
+#include "include/heap.h"
+#include "include/std.h"
+#include "../hals/include/irq.h"
+#include "../hals/include/tty.h"
+#include "../hals/include/init.h"
+#include "../hals/include/thread.h"
+#include "../hals/include/usermode.h"
+#include "../hals/include/syscall.h"
+#include "../hals/include/serial.h"
+#include "../hals/include/power.h"
 
 HeapObject system_heap;
 char system_cmdline[512];

@@ -24,9 +24,6 @@ typedef uint32_t status;
 #define TO_STRING(x) #x
 #define TO_STRINGX(x) TO_STRING(x)
 
-#define ENTER_CRITICAL_ZONE HALDisableInterrupts()
-#define LEAVE_CRITICAL_ZONE HALEnableInterrupts()
-
 #define NEVER_REFERENCED(x) (void)x
 #define SUCCESS 0x00000000
 #define FAILED_GENERAL 0x00000001
@@ -76,33 +73,6 @@ typedef struct {
 #define ASSERT(cond) if (cond) { } else { printf("!!!! assert failed, file: %s, line: %s, condition: %s !!!!\n", __FILE__, TO_STRINGX(__LINE__), TO_STRINGX(cond)); }
 #define NORETURN __attribute__ ((noreturn))
 
-#include "../ex/include/elf.h"
-#include "../hals/include/power.h"
-#include "../hals/include/usermode.h"
-#include "../hals/include/port.h"
-#include "../ex/include/heap.h"
-#include "../ex/include/llist.h"
-#include "../ex/include/memory.h"
-#include "../hals/include/timer.h"
-#include "../ex/include/panic.h"
-#include "../hals/include/tty.h"
-#include "../hals/include/irq.h"
-#include "../hals/include/pci.h"
-#include "../ex/include/std.h"
-#include "../hals/include/paging.h"
-#include "../hals/include/hii.h"
-#include "../ex/include/mp.h"
-#include "../ex/include/drive.h"
-#include "../hals/include/syscall.h"
-#include "../hals/include/thread.h"
-#include "../ex/include/file.h"
-#include "../hals/include/uefi.h"
-#include "../hals/include/serial.h"
-#include "../hals/include/debug.h"
-#include "../ex/include/process.h"
-#include "../hals/include/init.h"
-
 #include "multiboot.h"
 
-extern HeapObject system_heap;
 extern char system_cmdline[];

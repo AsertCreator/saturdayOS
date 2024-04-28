@@ -40,13 +40,16 @@ typedef struct {
 
 #define overhead sizeof(HeapFooterObject) + sizeof(HeapNodeObject)
 
-void HeapInitialize(HeapObject* heap, long start);
+extern HeapObject system_heap;
 
+void HeapInitialize(HeapObject* heap, long start);
 void* HeapAlloc(HeapObject* heap, size_t size);
 void HeapFree(HeapObject* heap, void* p);
-
 uint32_t HeapGetBinIndex(size_t sz);
 void HeapCreateFoot(HeapNodeObject* head);
 HeapFooterObject* HeapGetFoot(HeapNodeObject* head);
-
 HeapNodeObject* HeapGetWilderness(HeapObject* heap);
+void HeapAddNode(HeapBinObject* bin, HeapNodeObject* node);
+void HeapRemoveNode(HeapBinObject* bin, HeapNodeObject* node);
+HeapNodeObject* HeapGetBestFit(HeapBinObject* list, size_t size);
+HeapNodeObject* HeapGetLastNode(HeapBinObject* list);

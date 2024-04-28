@@ -1,7 +1,14 @@
 #include "../include/init.h"
+#include "../include/irq.h"
+#include "../include/pci.h"
+#include "../include/hii.h"
+#include "../include/tty.h"
+#include "../include/port.h"
+#include "../include/paging.h"
 #include "include/gdt.h"
 #include "include/idt.h"
 #include "include/isrs.h"
+#include "../../ex/include/panic.h"
 
 void HALInitialize() {
     ENTER_CRITICAL_ZONE;

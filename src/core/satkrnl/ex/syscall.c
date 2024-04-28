@@ -1,4 +1,7 @@
 #include "../hals/include/syscall.h"
+#include "../hals/include/tty.h"
+#include "include/heap.h"
+#include "include/std.h"
 
 int SkGetOSVersion() {
     return 0x00030000;

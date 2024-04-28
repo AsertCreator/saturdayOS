@@ -1,4 +1,7 @@
+#include "../include/port.h"
 #include "../include/serial.h"
+#include "../../ex/include/std.h"
+#include "../../ex/include/heap.h"
 
 SerialPort* serial_first;
 SerialPort* serial_last;

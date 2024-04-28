@@ -1,3 +1,5 @@
+#include "include/std.h"
+#include "include/memory.h"
 #include "../hals/include/tty.h"
 
 void printf(const char* fmt, ...) {

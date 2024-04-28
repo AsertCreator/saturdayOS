@@ -9,6 +9,9 @@ void HALInitializeInterrupts();
 void HALEnableInterrupts();
 void HALDisableInterrupts();
 
+#define ENTER_CRITICAL_ZONE HALDisableInterrupts()
+#define LEAVE_CRITICAL_ZONE HALEnableInterrupts()
+
 void irq0();
 void irq1();
 void irq2();

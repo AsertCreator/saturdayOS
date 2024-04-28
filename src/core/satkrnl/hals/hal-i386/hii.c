@@ -1,4 +1,7 @@
+#include "../include/tty.h"
+#include "../include/irq.h"
 #include "../include/hii.h"
+#include "../include/port.h"
 
 char kbdus[128] = {
     0,  27, '1', '2', '3', '4', '5', '6', '7', '8',	/* 9 */
@@ -54,10 +57,10 @@ void HALKeyboardHandler(RegisterContext *r) {
 }
 status HALInitializeHumanInteraction() {
     if (HALInitializeKeyboard() != SUCCESS) {
-        ExIssuePanic("couldn't initialize keyboard!", 0, 0);
+        TtyMgrLog(FAILED_NOTAVAL, "hii", "couldn't initialize keyboard!");
     }
     if (HALInitializeMouse() != SUCCESS) {
-        ExIssuePanic("couldn't initialize mouse!", 0, 0);
+        TtyMgrLog(FAILED_NOTAVAL, "hii", "couldn't initialize mouse!");
     }
     return SUCCESS;
 }

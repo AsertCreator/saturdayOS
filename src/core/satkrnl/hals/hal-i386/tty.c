@@ -1,4 +1,9 @@
 #include "../include/tty.h"
+#include "../include/irq.h"
+#include "../include/port.h"
+#include "../include/serial.h"
+#include "../../ex/include/std.h"
+#include "../../ex/include/memory.h"
 
 uint16_t* tty_buffer;
 uint8_t tty_sizex;
@@ -45,8 +50,12 @@ void TtyMgrPutCharacter(char c) {
 
 	TtyMgrSetCharacterAt(tty_cursorx, tty_cursory, c);
 
-	if (++tty_cursorx >= tty_sizex)
+	if (++tty_cursorx >= tty_sizex) {
 		tty_cursorx = 0;
+
+		if (++tty_cursory >= tty_sizey - 1)
+			TtyMgrScrollTerminal();
+	}
 
 	HALWriteSerialPortString(ch, port);
 }
@@ -60,10 +69,11 @@ void TtyMgrMoveCursor(uint8_t x, uint8_t y) {
 void TtyMgrScrollTerminal() {
 	ENTER_CRITICAL_ZONE;
 
-	StdCopyMemory(tty_buffer, tty_buffer + (tty_sizex * 2), (tty_sizex * 2) * (tty_sizey - 2));
-	StdFillMemory(tty_buffer + (tty_sizex * 2) * (tty_sizey - 1), 0, tty_sizex * 2);
+	StdCopyMemory(tty_buffer, tty_buffer + tty_sizex, (tty_sizex * (tty_sizey - 1)) * 2);
+	StdFillMemory(tty_buffer + tty_sizex * (tty_sizey - 1), 0, tty_sizex * 2);
 
-	// this shit doesn't let me to chnage the code. it triple faults. almost as it qemu fault
+	tty_cursorx = 0;
+	tty_cursory = tty_sizey - 1;
 
 	LEAVE_CRITICAL_ZONE;
 }

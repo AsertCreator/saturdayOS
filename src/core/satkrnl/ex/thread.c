@@ -1,4 +1,8 @@
+#include "include/std.h"
+#include "include/heap.h"
+#include "include/memory.h"
 #include "../hals/include/thread.h"
+#include "../hals/include/irq.h"
 
 static void TaskEntry() {
 	TaskObject* obj = (TaskObject*)current_thread->aux;

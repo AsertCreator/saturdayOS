@@ -1,4 +1,5 @@
-#include "../../include/system.h"
+#include "../include/syscall.h"
+#include "../include/tty.h"
 #include "include/idt.h"
 
 bool log_syscalls = false;

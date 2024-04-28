@@ -1,4 +1,6 @@
 #include "../include/pci.h"
+#include "../include/tty.h"
+#include "../include/port.h"
 
 uint16_t HALPciConfigReadWord(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset) {
     uint32_t address;

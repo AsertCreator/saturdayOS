@@ -1,4 +1,0 @@
-compile base
-compile core
-compile limine
-buildlimineiso limine.cfg
